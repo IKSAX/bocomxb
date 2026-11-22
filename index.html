@@ -76,7 +76,7 @@
         </div>
         
         <div class="form-group">
-            <label>3. 产品明细（可添加多个）</label>
+            <label>3. 产品明细（最多3个）</label>
             <div id="productList">
                 <!-- 初始一行 -->
                 <div class="product-row">
@@ -106,15 +106,15 @@
 
     <script>
         // ==========================================
-        // 核心配置区：参考你微调后的字号
+        // 核心配置区：排版位置与大小
         // ==========================================
         const layout = {
             branch:  { x: 0.5, y: 0.66, size: 0.075 }, 
             manager: { x: 0.5, y: 0.715, size: 0.075 }, 
-            product: { x: 0.5, y: 0.77, size: 0.055 },  // 稍小一点，防止多产品溢出
-            amount:  { x: 0.5, y: 0.82, size: 0.09 },  // 金额最醒目
-            beans:   { x: 0.5, y: 0.865, size: 0.05 }, 
-            date:    { x: 0.5, y: 0.91, size: 0.04 }  
+            product: { x: 0.5, y: 0.78, size: 0.055 },  // 产品区域（支持多行居中）
+            amount:  { x: 0.5, y: 0.85, size: 0.085 },  // 金额（适当下移，给多产品留出空间）
+            beans:   { x: 0.5, y: 0.89, size: 0.05 },   // 金豆
+            date:    { x: 0.5, y: 0.93, size: 0.04 }    // 日期
         };
         const textColor = "#8B0000";
         const fontFamily = "'Microsoft YaHei', 'PingFang SC', sans-serif";
@@ -127,16 +127,15 @@
         // ==========================================
         // 动态产品列表逻辑
         // ==========================================
-        name = "", amount = "") {
+        function addProductRow(name = "", amount = "") {
             const list = document.getElementById('productList');
             
-            // 新增：如果已经有3个产品，就不让加了（但如果是为了解析自动填入，则忽略限制）
+            // 如果已经有3个产品，就不让加了（但自动解析时传入了name则忽略限制）
             if (!name && list.children.length >= 3) {
                 alert("最多只能输入3个产品以保证排版美观！");
                 return;
             }
             
-            // ... 原有的 row 创建逻辑
             const row = document.createElement('div');
             row.className = 'product-row';
             row.innerHTML = `
@@ -153,7 +152,6 @@
             amounts.forEach(input => {
                 if(input.value) total += parseFloat(input.value);
             });
-            // 处理一下小数，避免出现浮点数精度问题
             document.getElementById('totalAmount').value = Math.round(total * 100) / 100;
         }
 
@@ -181,7 +179,6 @@
 
             // 4. 提取产品明细
             document.getElementById('productList').innerHTML = '';
-            // 全局匹配：任意字符+数字+万
             const productRegex = /([\u4e00-\u9fa5a-zA-Z0-9]+)\s*(\d+(?:\.\d+)?)\s*万/g;
             let match;
             let found = false;
@@ -189,7 +186,7 @@
                 addProductRow(match[1], match[2]);
                 found = true;
             }
-            if (!found) addProductRow(); // 如果没匹配到，留个空行
+            if (!found) addProductRow(); 
 
             alert("解析完成！请核对下方信息。");
         }
@@ -210,15 +207,12 @@
             const names = Array.from(document.querySelectorAll('.p-name')).map(i => i.value.trim()).filter(Boolean);
             const amounts = Array.from(document.querySelectorAll('.p-amount')).map(i => i.value.trim()).filter(Boolean);
             
-            // 组装产品文本（参考你的要求，去掉了啰嗦的字眼）
+            // 组装产品文本（每个产品换行）
             let productStr = "";
             if (names.length > 0) {
                 for(let i=0; i<Math.min(names.length, 3); i++) {
-                    // 注意这里的 \n，让每个产品单独成行
-                    productStr += `${names[i]} ${amounts[i]}万\n`; 
+                    productStr += `${names[i]} ${amounts[i]}万\n`;
                 }
-                if (names.length > 3) productStr += "等产品";
-                // 去掉最后多余的换行符
                 productStr = productStr.trim(); 
             }
 
@@ -235,24 +229,24 @@
             ctx.textBaseline = "middle";
             ctx.fillStyle = textColor;
 
+            // 绘图辅助函数：支持多行换行居中
             const drawText = (text, config) => {
                 const fontSize = canvas.width * config.size;
                 ctx.font = `bold ${fontSize}px ${fontFamily}`;
                 const x = canvas.width * config.x;
                 const baseY = canvas.height * config.y;
                 
-                // 支持换行符
                 const lines = text.split('\n');
                 const lineHeight = fontSize * 1.2; // 行高
                 
                 lines.forEach((line, index) => {
-                    // 如果是多行，将第一行往上提一点，保证整体居中
+                    // 如果是多行，将整体向上偏移，保证整体中心在坐标点上
                     const offsetY = (index - (lines.length - 1) / 2) * lineHeight;
                     ctx.fillText(line, x, baseY + offsetY);
                 });
             };
 
-            // 渲染排版（严格遵守你删减后的文字格式）
+            // 渲染（已删去“祝贺”、“销”等字眼）
             drawText(branch, layout.branch);
             drawText(manager, layout.manager);
             if (productStr) drawText(productStr, layout.product); 
