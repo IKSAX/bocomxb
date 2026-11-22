@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>销售喜报生成器</title>
+    <title>羊羊得亿·喜报生成器</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -298,12 +298,18 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(recordData)
-                }).then(res => {
+                }).then(async res => {
+                    const text = await res.text();
                     if (!res.ok) {
-                        return res.text().then(t => console.error('入库失败:', res.status, t));
+                        console.error('入库失败:', res.status, text);
+                        alert('提交失败：' + text);
+                    } else {
+                        console.log('✅ 喜报数据已保存');
                     }
-                    console.log('✅ 喜报数据已保存');
-                }).catch(err => console.error('数据保存失败:', err));
+                }).catch(err => {
+                    console.error('数据保存失败:', err);
+                    alert('提交失败：' + err.message);
+                });
             }
         }
 
