@@ -1,163 +1,319 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<meta name="robots" content="noindex,nofollow">
-<title>羊羊得亿 · 喜报生成器</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,sans-serif}
-body{padding:16px;background:#f7f7f7}
-.wrap{max-width:600px;margin:0 auto}
-.card{background:#fff;border-radius:12px;padding:20px;margin-bottom:16px}
-h2{text-align:center;margin-bottom:16px;color:#c8102e}
-.tip{white-space:pre-line;background:#fff8e8;padding:12px;border-radius:8px;margin-bottom:16px;font-size:14px;line-height:1.6}
-.form-item{margin-bottom:12px}
-label{display:block;margin-bottom:4px;font-weight:500}
-input,textarea{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:16px}
-textarea{min-height:100px;resize:vertical}
-button{width:100%;padding:12px;background:#c8102e;color:#fff;border:none;border-radius:8px;font-size:17px;font-weight:bold}
-#preview{margin-top:20px}
-#previewCanvas{width:100%;border-radius:12px}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>销售喜报生成器</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 450px;
+            margin-bottom: 20px;
+        }
+        h2 { text-align: center; color: #333; margin-top: 0; font-size: 20px;}
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 14px; color: #666; margin-bottom: 5px; font-weight: bold; }
+        input {
+            width: 100%; padding: 10px; border: 1px solid #ccc;
+            border-radius: 6px; box-sizing: border-box; font-size: 16px;
+        }
+        textarea {
+            width: 100%; padding: 10px; border: 1px solid #ccc;
+            border-radius: 6px; box-sizing: border-box; font-size: 14px;
+            height: 100px; resize: vertical;
+        }
+        input:focus, textarea:focus { border-color: #8B0000; outline: none; }
+
+        .product-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .product-row input { flex: 1; }
+
+        button {
+            width: 100%; padding: 12px; background-color: #8B0000;
+            color: white; border: none; border-radius: 6px;
+            font-size: 16px; font-weight: bold; cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover { background-color: #a50000; }
+        .btn-secondary { background-color: #666; margin-top: 5px; font-size: 14px; padding: 8px;}
+
+        .parse-box { background: #fff8f8; padding: 15px; border-radius: 8px; border: 1px dashed #8B0000; margin-bottom: 20px; }
+
+        .preview-area { width: 100%; max-width: 450px; text-align: center; }
+        canvas { width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); display: none; margin-bottom: 20px; }
+    </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="card">
-    <div class="tip">🔥🐑【羊羊得亿 · 一起赢金】基金竞赛
-🔗 内部链接使用，请勿外传
-📝 填写支行、客户经理、产品（最多3个）、总金额、金豆数量
-✅ 单个产品示例：
-📈中欧多元智选A
-50万元🧧
-✅ 2–3个产品示例：
-📈中欧多元智选A 50万🧧
-📈汇添富先锋A 48万🧧
-✅ 填好点【生成喜报并记录】
-💾 右键图片另存为即可转发
-📌 提交自动存档，自己不能查看、修改历史记录
-⚠️ 请勿乱填无效数据，有问题联系管理员
-🌟金豆攒不停，段位节节升🤩</div>
 
-    <div class="form-item">
-      <label>支行</label>
-      <input id="branch" placeholder="例如：XX支行">
+    <div class="container">
+        <!-- 智能解析区 -->
+        <div class="parse-box">
+            <h2 style="font-size:16px;">✨ 智能解析文字</h2>
+            <textarea id="rawText" placeholder="请粘贴文字版喜报内容...例如：&#10;🔥🐑【羊羊得亿 · 一起赢金】基金竞赛&#10;[烟花]祝贺xx支行xxx销售&#10;📈中欧多元智选A 50万🧧&#10;📈汇添富先锋A 48万🧧&#10;⭐️获得金豆7840颗"></textarea>
+            <button onclick="parseText()" style="margin-top: 10px;">一键解析</button>
+        </div>
+
+        <!-- 手动填表区 -->
+        <div class="form-group">
+            <label>1. 支行名称</label>
+            <input type="text" id="branch" placeholder="如：xx支行" maxlength="10">
+        </div>
+        <div class="form-group">
+            <label>2. 客户经理名称</label>
+            <input type="text" id="manager" placeholder="如：xxx">
+        </div>
+
+        <div class="form-group">
+            <label>3. 产品明细（最多3个）</label>
+            <div id="productList">
+                <!-- 初始一行 -->
+                <div class="product-row">
+                    <input type="text" class="p-name" placeholder="产品名称" maxlength="10">
+                    <input type="number" class="p-amount" placeholder="金额(万元)" oninput="calculateTotal()">
+                </div>
+            </div>
+            <button class="btn-secondary" onclick="addProductRow()">+ 添加产品</button>
+        </div>
+
+        <div class="form-group">
+            <label>4. 销售总金额(万元) - 自动汇总</label>
+            <input type="number" id="totalAmount" placeholder="自动汇总" readonly style="background: #eee; font-weight: bold; color: #8B0000;">
+        </div>
+        <div class="form-group">
+            <label>5. 金豆(颗)</label>
+            <input type="number" id="beans" placeholder="如：7840">
+        </div>
+
+        <button onclick="generatePoster()">生成喜报</button>
     </div>
-    <div class="form-item">
-      <label>客户经理</label>
-      <input id="manager" placeholder="姓名">
-    </div>
-    <div class="form-item">
-      <label>产品明细（最多3个）</label>
-      <textarea id="productText" placeholder="1个产品：产品名换行金额
-多个产品一行一条"></textarea>
-    </div>
-    <div class="form-item">
-      <label>销售总金额</label>
-      <input id="total_amount" placeholder="数字">
-    </div>
-    <div class="form-item">
-      <label>金豆数量</label>
-      <input id="beans" placeholder="金豆">
+
+    <div class="preview-area">
+        <canvas id="posterCanvas"></canvas>
+        <button id="downloadBtn" style="display: none;" onclick="downloadImage()">⬇️ 保存图片到相册</button>
     </div>
 
-    <button id="submitBtn">生成喜报并记录</button>
-  </div>
+    <script>
+        const WORKER_URL = 'https://xibao.leeduan.workers.dev'; // 后端中转地址
 
-  <div id="preview" class="card" style="display:none">
-    <canvas id="previewCanvas"></canvas>
-  </div>
-</div>
+        // ==========================================
+        // 核心配置区：排版位置与大小
+        // ==========================================
+        const layout = {
+            branch:  { x: 0.5, y: 0.65, size: 0.085 },
+            manager: { x: 0.5, y: 0.70, size: 0.090 },
+            product: { x: 0.5, y: 0.78, size: 0.085 },
+            amount:  { x: 0.5, y: 0.85, size: 0.09 },
+            beans:   { x: 0.5, y: 0.90, size: 0.05 },
+            date:    { x: 0.5, y: 0.93, size: 0.04 }
+        };
+        const textColor = "#8B0000";
+        const fontFamily = "'Microsoft YaHei', 'PingFang SC', sans-serif";
 
-<script>
-const submitBtn = document.getElementById('submitBtn')
-const canvas = document.getElementById('previewCanvas')
-const ctx = canvas.getContext('2d')
+        const bgImage = new Image();
+        bgImage.src = 'bg.jpg';
+        let isImageLoaded = false;
+        bgImage.onload = function() { isImageLoaded = true; };
 
-function parseProduct(text){
-  const lines = text.split('\n').map(s=>s.trim()).filter(s=>s)
-  const list = []
-  for(let line of lines){
-    if(list.length>=3) break
-    list.push(line)
-  }
-  return list
-}
+        // ==========================================
+        // 动态产品列表逻辑
+        // ==========================================
+        function addProductRow(name = "", amount = "") {
+            const list = document.getElementById('productList');
+            if (!name && list.children.length >= 3) {
+                alert("最多只能输入3个产品以保证排版美观！");
+                return;
+            }
+            const row = document.createElement('div');
+            row.className = 'product-row';
+            row.innerHTML = `
+                <input type="text" class="p-name" placeholder="产品名称" maxlength="10" value="${name}">
+                <input type="number" class="p-amount" placeholder="金额(万元)" value="${amount}" oninput="calculateTotal()">
+            `;
+            list.appendChild(row);
+            calculateTotal();
+        }
 
-function drawImage(branch,manager,products,total,beans){
-  canvas.width = 900
-  canvas.height = 1200
-  ctx.fillStyle='#c8102e'
-  ctx.fillRect(0,0,900,1200)
+        function calculateTotal() {
+            const amounts = document.querySelectorAll('.p-amount');
+            let total = 0;
+            amounts.forEach(input => {
+                if(input.value) total += parseFloat(input.value);
+            });
+            document.getElementById('totalAmount').value = Math.round(total * 100) / 100;
+        }
 
-  ctx.fillStyle='#fff'
-  ctx.font="bold 44px sans-serif"
-  ctx.textAlign="center"
-  ctx.fillText('🔥🐑【羊羊得亿 · 一起赢金】基金竞赛',450,120)
+        // ==========================================
+        // 智能解析逻辑（严格按固定模板截取）
+        // ==========================================
+        function parseText() {
+            const text = document.getElementById('rawText').value;
+            if (!text) { alert("请先粘贴文字内容！"); return; }
 
-  ctx.font="bold 36px sans-serif"
-  ctx.fillText(`🎉祝贺${branch} ${manager}`,450,220)
+            // 1. 提取支行（先去掉“祝贺”等前缀干扰，然后匹配2到10个汉字，以“支行”或“分行”结尾）
+            const cleanText = text.replace(/.*(祝贺|恭喜|庆祝)/, '');
 
-  ctx.font="32px sans-serif"
-  let y = 300
-  const isSingle = products.length===1
-  for(let p of products){
-    if(isSingle){
-      const parts = p.split(/\s+/)
-      const name = parts[0]||''
-      const num = parts.slice(1).join(' ')||''
-      ctx.fillText(`📈${name}`,450,y)
-      y += 48
-      ctx.fillText(`${num}🧧`,450,y)
-      y += 60
-    }else{
-      ctx.fillText(`📈${p}🧧`,450,y)
-      y += 48
-    }
-  }
+            // 匹配 2-10 个字，且以 支行/分行 结尾
+            const branchMatch = cleanText.match(/([\u4e00-\u9fa5]{2,10}(?:支行|分行))/);
+            let branchName = "";
+            if (branchMatch) {
+                branchName = branchMatch[1];
+                document.getElementById('branch').value = branchName;
+            } else {
+                // 如果没匹配到支行，或者用户没写“祝贺”，直接在全文中找
+                const fallbackBranchMatch = text.match(/([\u4e00-\u9fa5]{2,10}(?:支行|分行))/);
+                if (fallbackBranchMatch) {
+                    branchName = fallbackBranchMatch[1];
+                    document.getElementById('branch').value = branchName;
+                }
+            }
+            // 2. 提取客户经理名字（支行结尾 到 销售 之间的文字）
+            if (branchName) {
+                const branchEndIndex = text.indexOf(branchName) + branchName.length;
+                let saleIndex = text.indexOf('销售', branchEndIndex);
+                if (saleIndex === -1) saleIndex = text.indexOf('成功', branchEndIndex);
+                if (saleIndex === -1) saleIndex = text.indexOf('获得', branchEndIndex);
 
-  ctx.fillText(`⭐️获得金豆${beans}颗`,450,y+40)
-  ctx.fillText(`🌟金豆攒不停，段位节节升🤩`,450,y+100)
-}
+                if (saleIndex !== -1) {
+                    let nameStr = text.substring(branchEndIndex, saleIndex).trim();
+                    nameStr = nameStr.replace(/[，,。！!\s]/g, ''); // 清除标点
+                    document.getElementById('manager').value = nameStr;
+                } else {
+                    const afterBranch = text.substring(branchEndIndex).trim().replace(/[，,。！!\s]/g, '');
+                    const nameMatch = afterBranch.match(/^([\u4e00-\u9fa5]{2,4})/);
+                    if (nameMatch) document.getElementById('manager').value = nameMatch[1];
+                }
+            }
 
-submitBtn.onclick = async function(){
-  const branch = document.getElementById('branch').value.trim()
-  const manager = document.getElementById('manager').value.trim()
-  const productText = document.getElementById('productText').value.trim()
-  const total_amount = document.getElementById('total_amount').value.trim()
-  const beans = document.getElementById('beans').value.trim()
+            // 3. 提取金豆
+            const beansMatch = text.match(/金豆[^\d]*(\d+)/);
+            if (beansMatch) document.getElementById('beans').value = beansMatch[1];
 
-  if(!branch||!manager||!productText||!total_amount||!beans){
-    alert('请填写全部信息')
-    return
-  }
-  const productList = parseProduct(productText)
+            // 4. 提取产品明细
+            document.getElementById('productList').innerHTML = '';
+            const productRegex = /([\u4e00-\u9fa5a-zA-Z0-9]+)\s*(\d+(?:\.\d+)?)\s*万/g;
+            let match;
+            let found = false;
+            while ((match = productRegex.exec(text)) !== null) {
+                let pName = match[1].replace(/销售|成功|祝贺|恭喜|获得/g, '');
+                addProductRow(pName, match[2]);
+                found = true;
+            }
+            if (!found) addProductRow();
 
-  drawImage(branch,manager,productList,Number(total_amount),Number(beans))
-  document.getElementById('preview').style.display='block'
+            alert("解析完成！请核对下方信息。");
+        }
 
-  try{
-    const res = await fetch("https://xibao.leeduan.workers.dev",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        branch,
-        manager,
-        total_amount:Number(total_amount),
-        beans:Number(beans),
-        products:productList
-      })
-    })
-    const ret = await res.json()
-    if(ret.error){
-      alert("网络异常："+ret.error.message)
-    }else{
-      alert("生成成功✅")
-    }
-  }catch(e){
-    alert("网络异常："+e.message)
-  }
-}
-</script>
+        // ==========================================
+        // 生成喜报及上报数据逻辑
+        // ==========================================
+        function generatePoster() {
+            if (!isImageLoaded) { alert("背景图未加载！请确保 bg.jpg 存在。"); return; }
+
+            const branch = document.getElementById('branch').value.trim();
+            const manager = document.getElementById('manager').value.trim();
+            const totalAmount = document.getElementById('totalAmount').value;
+            const beans = document.getElementById('beans').value.trim();
+
+            if (!branch || !manager || !totalAmount || !beans) { alert("请填完必填项！"); return; }
+
+            const names = Array.from(document.querySelectorAll('.p-name')).map(i => i.value.trim()).filter(Boolean);
+            const amounts = Array.from(document.querySelectorAll('.p-amount')).map(i => i.value.trim()).filter(Boolean);
+            const productCount = names.length;
+
+            // 组装产品文本（每个产品换行）
+            let productStr = "";
+            if (names.length > 0) {
+                for(let i=0; i<Math.min(names.length, 3); i++) {
+                    productStr += `${names[i]} ${amounts[i]}万\n`;
+                }
+                productStr = productStr.trim();
+            }
+
+            const today = new Date();
+            const dateStr = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`;
+
+            const canvas = document.getElementById('posterCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = bgImage.width;
+            canvas.height = bgImage.height;
+            ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = textColor;
+
+            const drawText = (text, config) => {
+                const fontSize = canvas.width * config.size;
+                ctx.font = `bold ${fontSize}px ${fontFamily}`;
+                const x = canvas.width * config.x;
+                const baseY = canvas.height * config.y;
+                const lines = text.split('\n');
+                const lineHeight = fontSize * 1.2;
+                lines.forEach((line, index) => {
+                    const offsetY = (index - (lines.length - 1) / 2) * lineHeight;
+                    ctx.fillText(line, x, baseY + offsetY);
+                });
+            };
+
+            drawText(branch, layout.branch);
+            drawText(manager, layout.manager);
+            if (productStr) drawText(productStr, layout.product);
+            // 单个产品时不展示“累计总金额”行（避免与产品金额重复）
+            if (productCount > 1) {
+                drawText(`累计${totalAmount}万元`, layout.amount);
+            }
+            drawText(`喜获金豆${beans}颗`, layout.beans);
+            drawText(dateStr, layout.date);
+
+            canvas.style.display = "block";
+            document.getElementById('downloadBtn').style.display = "block";
+
+            // ==========================================
+            // 静默上报数据到 Supabase
+            // ==========================================
+            {
+                const recordData = {
+                    branch: branch,
+                    manager: manager,
+                    products: names.map((name, index) => ({ name: name, amount: amounts[index] })),
+                    total_amount: parseFloat(totalAmount),
+                    beans: parseInt(beans)
+                };
+
+                fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(recordData)
+                }).then(res => {
+                    if (!res.ok) {
+                        return res.text().then(t => console.error('入库失败:', res.status, t));
+                    }
+                    console.log('✅ 喜报数据已保存');
+                }).catch(err => console.error('数据保存失败:', err));
+            }
+        }
+
+        function downloadImage() {
+            const canvas = document.getElementById('posterCanvas');
+            const link = document.createElement('a');
+            link.download = `销售喜报_${document.getElementById('manager').value}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
 </body>
 </html>
