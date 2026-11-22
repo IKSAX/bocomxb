@@ -91,11 +91,11 @@
         // ==========================================
         const layout = {
             // x 都为 0.5 (即50%，表示水平居中)
-            branch:  { x: 0.5, y: 0.66, size: 0.045 }, // 支行名称 字号占宽度的4.5%
-            manager: { x: 0.5, y: 0.715, size: 0.03 }, // 客户经理
-            product: { x: 0.5, y: 0.755, size: 0.03 }, // 产品
-            amount:  { x: 0.5, y: 0.795, size: 0.035 }, // 金额
-            beans:   { x: 0.5, y: 0.835, size: 0.035 }, // 金豆
+            branch:  { x: 0.5, y: 0.66, size: 0.075 }, // 支行名称 字号占宽度的4.5%
+            manager: { x: 0.5, y: 0.715, size: 0.05 }, // 客户经理
+            product: { x: 0.5, y: 0.755, size: 0.05 }, // 产品
+            amount:  { x: 0.5, y: 0.795, size: 0.06 }, // 金额
+            beans:   { x: 0.5, y: 0.835, size: 0.03 }, // 金豆
             date:    { x: 0.5, y: 0.89, size: 0.025 }  // 日期
         };
         const textColor = "#8B0000"; // 深红色
@@ -159,10 +159,10 @@
 
             // 渲染 6 项信息（按你的要求加入了后缀）
             drawText(branch, layout.branch);
-            drawText(`客户经理 ${manager} 成功营销`, layout.manager);
-            drawText(`产品：${product}`, layout.product);
-            drawText(`销售金额：${amount} 万元`, layout.amount);
-            drawText(`喜获金豆：${beans} 颗`, layout.beans);
+            drawText(` ${manager} `, layout.manager);
+            drawText(`${product}`, layout.product);
+            drawText(`${amount} 万元`, layout.amount);
+            drawText(`喜获金豆${beans} 颗`, layout.beans);
             drawText(dateStr, layout.date);
 
             // 显示 Canvas 和下载按钮
