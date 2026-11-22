@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>销售喜报生成器（智能版）</title>
+    <title>销售喜报生成器（智能数据版）</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -61,18 +61,18 @@
         <!-- 智能解析区 -->
         <div class="parse-box">
             <h2 style="font-size:16px;">✨ 智能解析文字</h2>
-            <textarea id="rawText" placeholder="请粘贴文字版喜报内容...;例如：&#10;[烟花]祝贺xx支行xxx销售&#10;📈中欧多元智选A 50万🧧&#10;📈汇添富先锋A 48万🧧&#10;⭐️获得金豆7840颗"></textarea>
+            <textarea id="rawText" placeholder="请粘贴文字版喜报内容...&#10;例如：&#10;🔥🐑【羊羊得亿 · 一起赢金】基金竞赛&#10;[烟花]祝贺长庆支行杜清博销售&#10;📈中欧多元智选A 50万🧧&#10;📈汇添富先锋A 48万🧧&#10;⭐️获得金豆7840颗"></textarea>
             <button onclick="parseText()" style="margin-top: 10px;">一键解析</button>
         </div>
 
         <!-- 手动填表区 -->
         <div class="form-group">
             <label>1. 支行名称</label>
-            <input type="text" id="branch" placeholder="如：xx支行" maxlength="10">
+            <input type="text" id="branch" placeholder="如：长庆支行" maxlength="10">
         </div>
         <div class="form-group">
             <label>2. 客户经理名称</label>
-            <input type="text" id="manager" placeholder="如：xxx">
+            <input type="text" id="manager" placeholder="如：杜清博">
         </div>
         
         <div class="form-group">
@@ -96,7 +96,7 @@
             <input type="number" id="beans" placeholder="如：7840">
         </div>
 
-        <button onclick="generatePoster()">生成喜报</button>
+        <button onclick="generatePoster()">生成喜报并记录</button>
     </div>
 
     <div class="preview-area">
@@ -106,15 +106,21 @@
 
     <script>
         // ==========================================
+        // ⚠️ 第一步：请在这里填入你的 Supabase 配置
+        // ==========================================
+        const SUPABASE_URL = 'mnlpzgloovfptdolouyu'; // Project URL
+        const SUPABASE_KEY = 'ap-northeast-2'; // anon public key
+
+        // ==========================================
         // 核心配置区：排版位置与大小
         // ==========================================
         const layout = {
-            branch:  { x: 0.5, y: 0.66, size: 0.080 }, //支行
-            manager: { x: 0.5, y: 0.715, size: 0.085 }, //客户经理
-            product: { x: 0.5, y: 0.78, size: 0.065 },  // 产品区域（支持多行居中）
-            amount:  { x: 0.5, y: 0.85, size: 0.085 },  // 金额（适当下移，给多产品留出空间）
-            beans:   { x: 0.5, y: 0.90, size: 0.05 },   // 金豆
-            date:    { x: 0.5, y: 0.93, size: 0.04 }    // 日期
+            branch:  { x: 0.5, y: 0.66, size: 0.075 }, 
+            manager: { x: 0.5, y: 0.715, size: 0.075 }, 
+            product: { x: 0.5, y: 0.78, size: 0.055 },  
+            amount:  { x: 0.5, y: 0.85, size: 0.085 },  
+            beans:   { x: 0.5, y: 0.89, size: 0.05 },   
+            date:    { x: 0.5, y: 0.93, size: 0.04 }    
         };
         const textColor = "#8B0000";
         const fontFamily = "'Microsoft YaHei', 'PingFang SC', sans-serif";
@@ -129,13 +135,10 @@
         // ==========================================
         function addProductRow(name = "", amount = "") {
             const list = document.getElementById('productList');
-            
-            // 如果已经有3个产品，就不让加了（但自动解析时传入了name则忽略限制）
             if (!name && list.children.length >= 3) {
                 alert("最多只能输入3个产品以保证排版美观！");
                 return;
             }
-            
             const row = document.createElement('div');
             row.className = 'product-row';
             row.innerHTML = `
@@ -156,7 +159,7 @@
         }
 
         // ==========================================
-        // 智能解析逻辑（正则匹配）
+        // 智能解析逻辑（严格按固定模板截取）
         // ==========================================
         function parseText() {
             const text = document.getElementById('rawText').value;
@@ -170,24 +173,18 @@
                 document.getElementById('branch').value = branchName;
             }
 
-            // 2. 提取客户经理名字（精准截取：支行结尾 到 销售 之间的文字）
+            // 2. 提取客户经理名字（支行结尾 到 销售 之间的文字）
             if (branchName) {
-                // 找到“支行/分行”在整段文字里的位置
                 const branchEndIndex = text.indexOf(branchName) + branchName.length;
-                
-                // 从这个位置往后找“销售”这个词（如果找不到就找“成功营销”或“获得”）
                 let saleIndex = text.indexOf('销售', branchEndIndex);
                 if (saleIndex === -1) saleIndex = text.indexOf('成功', branchEndIndex);
                 if (saleIndex === -1) saleIndex = text.indexOf('获得', branchEndIndex);
 
                 if (saleIndex !== -1) {
-                    // 截取中间的部分
                     let nameStr = text.substring(branchEndIndex, saleIndex).trim();
-                    // 去掉可能混入的标点符号
-                    nameStr = nameStr.replace(/[，,。！!\s]/g, '');
+                    nameStr = nameStr.replace(/[，,。！!\s]/g, ''); // 清除标点
                     document.getElementById('manager').value = nameStr;
                 } else {
-                    // 如果没找到“销售”，就退而求其次，截取后面 2-4 个字
                     const afterBranch = text.substring(branchEndIndex).trim().replace(/[，,。！!\s]/g, '');
                     const nameMatch = afterBranch.match(/^([\u4e00-\u9fa5]{2,4})/);
                     if (nameMatch) document.getElementById('manager').value = nameMatch[1];
@@ -200,31 +197,11 @@
 
             // 4. 提取产品明细
             document.getElementById('productList').innerHTML = '';
-            // 产品正则：匹配任意中英文数字组合，后面跟着数字和“万”
             const productRegex = /([\u4e00-\u9fa5a-zA-Z0-9]+)\s*(\d+(?:\.\d+)?)\s*万/g;
             let match;
             let found = false;
             while ((match = productRegex.exec(text)) !== null) {
-                // 把可能混入的产品前缀“销售”、“成功”等过滤掉
-                let pName = match[1].replace(/销售|成功|祝贺/g, '');
-                addProductRow(pName, match[2]);
-                found = true;
-            }
-            if (!found) addProductRow(); 
-
-            alert("解析完成！请核对下方信息。");
-        }
-            // 3. 提取金豆
-            const beansMatch = text.match(/金豆[^\d]*(\d+)/);
-            if (beansMatch) document.getElementById('beans').value = beansMatch[1];
-
-            // 4. 提取产品明细
-            document.getElementById('productList').innerHTML = '';
-            const productRegex = /([\u4e00-\u9fa5a-zA-Z0-9]+)\s*(\d+(?:\.\d+)?)\s*万/g;
-            let match;
-            let found = false;
-            while ((match = productRegex.exec(text)) !== null) {
-                let pName = match[1].replace(/销售|成功|祝贺|恭喜/g, '');
+                let pName = match[1].replace(/销售|成功|祝贺|恭喜|获得/g, '');
                 addProductRow(pName, match[2]);
                 found = true;
             }
@@ -234,7 +211,7 @@
         }
 
         // ==========================================
-        // 生成喜报逻辑
+        // 生成喜报及上报数据逻辑
         // ==========================================
         function generatePoster() {
             if (!isImageLoaded) { alert("背景图未加载！请确保 bg.jpg 存在。"); return; }
@@ -271,24 +248,19 @@
             ctx.textBaseline = "middle";
             ctx.fillStyle = textColor;
 
-            // 绘图辅助函数：支持多行换行居中
             const drawText = (text, config) => {
                 const fontSize = canvas.width * config.size;
                 ctx.font = `bold ${fontSize}px ${fontFamily}`;
                 const x = canvas.width * config.x;
                 const baseY = canvas.height * config.y;
-                
                 const lines = text.split('\n');
-                const lineHeight = fontSize * 1.2; // 行高
-                
+                const lineHeight = fontSize * 1.2; 
                 lines.forEach((line, index) => {
-                    // 如果是多行，将整体向上偏移，保证整体中心在坐标点上
                     const offsetY = (index - (lines.length - 1) / 2) * lineHeight;
                     ctx.fillText(line, x, baseY + offsetY);
                 });
             };
 
-            // 渲染（已删去“祝贺”、“销”等字眼）
             drawText(branch, layout.branch);
             drawText(manager, layout.manager);
             if (productStr) drawText(productStr, layout.product); 
@@ -298,12 +270,38 @@
 
             canvas.style.display = "block";
             document.getElementById('downloadBtn').style.display = "block";
+
+            // ==========================================
+            // 静默上报数据到 Supabase
+            // ==========================================
+            if (SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
+                const recordData = {
+                    branch: branch,
+                    manager: manager,
+                    products: names.map((name, index) => ({ name: name, amount: amounts[index] })),
+                    total_amount: parseFloat(totalAmount),
+                    beans: parseInt(beans)
+                };
+
+                fetch(`${SUPABASE_URL}/rest/v1/xibao_records`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(recordData)
+                }).catch(err => console.log('数据保存失败:', err));
+            } else {
+                console.log('未配置 Supabase，跳过数据上报');
+            }
         }
 
         function downloadImage() {
             const canvas = document.getElementById('posterCanvas');
             const link = document.createElement('a');
-            link.download = '销售喜报.png';
+            link.download = `销售喜报_${document.getElementById('manager').value}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
         }
