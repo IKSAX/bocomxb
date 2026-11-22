@@ -292,15 +292,15 @@
             }).then(res => {
                 if (!res.ok) {
                     return res.text().then(t => {
-                        console.error('入库失败:', res.status, t);
-                        alert("数据保存失败！F12控制台查看详情");
+                        console.error('网络异常', res.status, t);
+                        alert("网络异常");
                     });
                 }
-                console.log('✅ 喜报数据已保存');
-                alert("✅ 数据保存成功！");
+                console.log('✅ 喜报已生成');
+                alert("✅ 喜报已生成");
             }).catch(err => {
-                console.error('数据保存失败:', err);
-                alert("网络异常，保存失败");
+                console.error('网络异常', err);
+                alert("网络异常");
             });
         }
 
