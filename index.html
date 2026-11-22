@@ -235,12 +235,18 @@
             // 组装产品文本（每个产品换行）
             let productStr = "";
             if (names.length > 0) {
-                for(let i=0; i<Math.min(names.length, 3); i++) {
-                    productStr += `${names[i]} ${amounts[i]}万\n`;
+                const max = Math.min(names.length, 3);
+                for(let i=0; i<max; i++) {
+                    if (max === 1) {
+                    // 单个产品：名称一行，金额另起一行，居中
+                        productStr += `${names[i]}\n${amounts[i]}万`;
+                    } else {
+                    // 多个产品保持原有样式：名称+金额同一行
+                        productStr += `${names[i]} ${amounts[i]}万\n`;
+                    }
                 }
                 productStr = productStr.trim();
             }
-
             const today = new Date();
             const dateStr = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`;
 
@@ -280,8 +286,6 @@
             canvas.style.display = "block";
             document.getElementById('downloadBtn').style.display = "block";
 
-            // ==========================================
-            // 静默上报数据到 Supabase
             // ==========================================
             {
                 const recordData = {
