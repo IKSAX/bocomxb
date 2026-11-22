@@ -127,8 +127,16 @@
         // ==========================================
         // 动态产品列表逻辑
         // ==========================================
-        function addProductRow(name = "", amount = "") {
+        name = "", amount = "") {
             const list = document.getElementById('productList');
+            
+            // 新增：如果已经有3个产品，就不让加了（但如果是为了解析自动填入，则忽略限制）
+            if (!name && list.children.length >= 3) {
+                alert("最多只能输入3个产品以保证排版美观！");
+                return;
+            }
+            
+            // ... 原有的 row 创建逻辑
             const row = document.createElement('div');
             row.className = 'product-row';
             row.innerHTML = `
@@ -206,9 +214,12 @@
             let productStr = "";
             if (names.length > 0) {
                 for(let i=0; i<Math.min(names.length, 3); i++) {
-                    productStr += `${names[i]} ${amounts[i]}万  `;
+                    // 注意这里的 \n，让每个产品单独成行
+                    productStr += `${names[i]} ${amounts[i]}万\n`; 
                 }
                 if (names.length > 3) productStr += "等产品";
+                // 去掉最后多余的换行符
+                productStr = productStr.trim(); 
             }
 
             const today = new Date();
@@ -228,8 +239,17 @@
                 const fontSize = canvas.width * config.size;
                 ctx.font = `bold ${fontSize}px ${fontFamily}`;
                 const x = canvas.width * config.x;
-                const y = canvas.height * config.y;
-                ctx.fillText(text, x, y);
+                const baseY = canvas.height * config.y;
+                
+                // 支持换行符
+                const lines = text.split('\n');
+                const lineHeight = fontSize * 1.2; // 行高
+                
+                lines.forEach((line, index) => {
+                    // 如果是多行，将第一行往上提一点，保证整体居中
+                    const offsetY = (index - (lines.length - 1) / 2) * lineHeight;
+                    ctx.fillText(line, x, baseY + offsetY);
+                });
             };
 
             // 渲染排版（严格遵守你删减后的文字格式）
