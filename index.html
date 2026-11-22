@@ -165,14 +165,24 @@
             const text = document.getElementById('rawText').value;
             if (!text) { alert("请先粘贴文字内容！"); return; }
 
-            // 1. 提取支行（匹配 2-10 个汉字，以“支行”或“分行”结尾）
-            const branchMatch = text.match(/([\u4e00-\u9fa5]{2,10}(?:支行|分行))/);
+            // 1. 提取支行（先去掉“祝贺”等前缀干扰，然后匹配2到10个汉字，以“支行”或“分行”结尾）
+            // 先找到第一个“祝贺”、“恭喜”等词，截掉它，让后续匹配更干净
+            const cleanText = text.replace(/.*(祝贺|恭喜|庆祝)/, '');
+            
+            // 匹配 2-10 个字，且以 支行/分行 结尾
+            const branchMatch = cleanText.match(/([\u4e00-\u9fa5]{2,10}(?:支行|分行))/);
             let branchName = "";
             if (branchMatch) {
                 branchName = branchMatch[1];
                 document.getElementById('branch').value = branchName;
+            } else {
+                // 如果没匹配到支行，或者用户没写“祝贺”，直接在全文中找
+                const fallbackBranchMatch = text.match(/([\u4e00-\u9fa5]{2,10}(?:支行|分行))/);
+                if (fallbackBranchMatch) {
+                    branchName = fallbackBranchMatch[1];
+                    document.getElementById('branch').value = branchName;
+                }
             }
-
             // 2. 提取客户经理名字（支行结尾 到 销售 之间的文字）
             if (branchName) {
                 const branchEndIndex = text.indexOf(branchName) + branchName.length;
