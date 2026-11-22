@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="zh-CN"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;销售喜报生成器&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: #f4f4f9;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin: 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 20px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>flex-direction: column;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.container {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: white;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>padding: 20px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 12px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 4px 12px rgba(0,0,0,0.1);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>max-width: 400px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 20px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>h2 { text-align: center; color: #333; margin-top: 0; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.form-group { margin-bottom: 15px; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>label { display: block; font-size: 14px; color: #666; margin-bottom: 5px; font-weight: bold; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>input {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 100%; padding: 10px; border: 1px solid #ccc;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 6px; box-sizing: border-box; font-size: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>input:focus { border-color: #8B0000; outline: none; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>button {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 100%; padding: 12px; background-color: #8B0000;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: white; border: none; border-radius: 6px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-size: 16px; font-weight: bold; cursor: pointer;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 10px; transition: background 0.3s;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>button:hover { background-color: #a50000; }</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* 预览区 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.preview-area {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 100%; max-width: 400px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>canvas {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 100%; height: auto;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 4px 12px rgba(0,0,0,0.2);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: none; /* 初始隐藏，生成后显示 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 20px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="container"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h2&gt;🏆 生成销售喜报&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="form-group"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;label&gt;1. 支行名称 (限10字)&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;input type="text" id="branch" placeholder="如：科技路支行" maxlength="10"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="form-group"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;label&gt;2. 客户经理名称&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;input type="text" id="manager" placeholder="如：张三"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="form-group"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;label&gt;3. 产品名称 (限10字)&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;input type="text" id="product" placeholder="如：稳利宝" maxlength="10"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="form-group"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;label&gt;4. 销售金额 (万元)&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;input type="number" id="amount" placeholder="如：500"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="form-group"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;label&gt;5. 金豆 (颗)&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;input type="number" id="beans" placeholder="如：1200"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button onclick="generatePoster()"&gt;点击生成喜报&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="preview-area"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;canvas id="posterCanvas"&gt;&lt;/canvas&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button id="downloadBtn" style="display: none;" onclick="downloadImage()"&gt;⬇️ 保存图片到相册&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// ==========================================</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 核心配置区：后续如果位置微调，修改这里的百分比数字即可</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// ==========================================</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const layout = {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>// x 都为 0.5 (即50%，表示水平居中)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>branch:<span class="Apple-converted-space">  </span>{ x: 0.5, y: 0.66, size: 0.045 }, // 支行名称 字号占宽度的4.5%</p>
+<p class="p1"><span class="Apple-converted-space">            </span>manager: { x: 0.5, y: 0.715, size: 0.03 }, // 客户经理</p>
+<p class="p1"><span class="Apple-converted-space">            </span>product: { x: 0.5, y: 0.755, size: 0.03 }, // 产品</p>
+<p class="p1"><span class="Apple-converted-space">            </span>amount:<span class="Apple-converted-space">  </span>{ x: 0.5, y: 0.795, size: 0.035 }, // 金额</p>
+<p class="p1"><span class="Apple-converted-space">            </span>beans: <span class="Apple-converted-space">  </span>{ x: 0.5, y: 0.835, size: 0.035 }, // 金豆</p>
+<p class="p1"><span class="Apple-converted-space">            </span>date:<span class="Apple-converted-space">    </span>{ x: 0.5, y: 0.89, size: 0.025 }<span class="Apple-converted-space">  </span>// 日期</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const textColor = "#8B0000"; // 深红色</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const fontFamily = "'Microsoft YaHei', 'PingFang SC', sans-serif";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// 加载背景图（注意：请将你的背景图命名为 bg.jpg 并和此 html 放在同一目录）</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const bgImage = new Image();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>bgImage.src = 'bg.jpg';<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>let isImageLoaded = false;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>bgImage.onload = function() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>isImageLoaded = true;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 页面加载后可以先在控制台打印一下背景图尺寸，确认是否正常</p>
+<p class="p1"><span class="Apple-converted-space">            </span>console.log("背景图加载成功，尺寸:", bgImage.width, bgImage.height);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function generatePoster() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!isImageLoaded) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>alert("背景图尚未加载完成或路径错误，请确保 bg.jpg 与本网页在同一文件夹！");</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const branch = document.getElementById('branch').value.trim();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const manager = document.getElementById('manager').value.trim();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const product = document.getElementById('product').value.trim();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const amount = document.getElementById('amount').value.trim();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const beans = document.getElementById('beans').value.trim();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!branch || !manager || !product || !amount || !beans) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>alert("请将信息填写完整！");</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 获取今天的日期</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const today = new Date();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const dateStr = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const canvas = document.getElementById('posterCanvas');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const ctx = canvas.getContext('2d');</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 设置画布大小与背景图一致（保持高清）</p>
+<p class="p1"><span class="Apple-converted-space">            </span>canvas.width = bgImage.width;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>canvas.height = bgImage.height;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 1. 绘制背景图</p>
+<p class="p1"><span class="Apple-converted-space">            </span>ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 2. 绘制文字</p>
+<p class="p1"><span class="Apple-converted-space">            </span>ctx.textAlign = "center";</p>
+<p class="p1"><span class="Apple-converted-space">            </span>ctx.textBaseline = "middle";</p>
+<p class="p1"><span class="Apple-converted-space">            </span>ctx.fillStyle = textColor;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 辅助绘制函数</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const drawText = (text, config) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const fontSize = canvas.width * config.size;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>ctx.font = `bold ${fontSize}px ${fontFamily}`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const x = canvas.width * config.x;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const y = canvas.height * config.y;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>ctx.fillText(text, x, y);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 渲染 6 项信息（按你的要求加入了后缀）</p>
+<p class="p1"><span class="Apple-converted-space">            </span>drawText(branch, layout.branch);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>drawText(`客户经理 ${manager} 成功营销`, layout.manager);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>drawText(`产品：${product}`, layout.product);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>drawText(`销售金额：${amount} 万元`, layout.amount);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>drawText(`喜获金豆：${beans} 颗`, layout.beans);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>drawText(dateStr, layout.date);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 显示 Canvas 和下载按钮</p>
+<p class="p1"><span class="Apple-converted-space">            </span>canvas.style.display = "block";</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('downloadBtn').style.display = "block";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function downloadImage() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const canvas = document.getElementById('posterCanvas');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const link = document.createElement('a');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>link.download = '销售喜报.png';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>link.href = canvas.toDataURL('image/png');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>link.click();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
